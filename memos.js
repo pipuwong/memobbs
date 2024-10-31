@@ -552,6 +552,9 @@ async function updateHtml(data) {
     let memo = data[i];
     //console.log(memo)
     let link = memo.link;
+    if (!link.endsWith('/')) {
+      link += '/';
+    }
     let memoString = JSON.stringify(memo).replace(/"/g, '&quot;');
     let avatar = memo.avatar;
     let count = memo.count || "";
@@ -565,7 +568,7 @@ async function updateHtml(data) {
     let twikooEnv = memo.twikoo;
     let artalkEnv = memo.artalk;
     let artSite = `${memo.artSite}`;
-    let memosLink = memo.link + "/m/" + (memo.uid || memo.name || memo.id);
+    let memosLink = link + "m/" + (memo.uid || memo.name || memo.id);
     let memosRes = memo.content
       .replace(TAG_REG, "")
       .replace(IMG_REG, "")
@@ -635,7 +638,7 @@ async function updateHtml(data) {
             }else if(resourceList[j].name !== undefined){
               fileId = resourceList[j].name+"?thumbnail=1"
             }
-            imgLink = `${memo.link}/o/r/${fileId}`;
+            imgLink = `${link}o/r/${fileId}`;
         }
         if (restype == 'image') {
           imgUrl += `<div class="memo-resource w-100"><img class="lozad" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="${imgLink}"/></div>`;
@@ -834,7 +837,6 @@ myFeedsBtn.addEventListener('click', function(event) {
     }
     memoDom.innerHTML = `<div class="myfeeds-option row px-2 pb-2">
       <div class="myfeeds-xml card-item px-3 py-2 mr-3" data-type="bfind" onclick="myFeedsXML(this)">BlogFinder</div>
-      <div class="myfeeds-xml card-item px-3 py-2 mr-3" data-type="jixin"  onclick="myFeedsXML(this)">积薪</div>
       <div class="myfeeds-xml card-item px-3 py-2 mr-3" data-type="boyou"  onclick="myFeedsXML(this)">博友圈</div>
       <div class="myfeeds-xml card-item px-3 py-2 mr-3" data-type="shinian"  onclick="myFeedsXML(this)">十年之约</div>
     </div>
@@ -870,38 +872,6 @@ function myFeedsXML(e){
       });
       var myFeedArticle = '';
       for (var i = 0;i<20;i++){
-        let item = entries[i];
-        myFeedArticle +=`
-        <div class="card-item flex-fill p-3">
-          <div class="d-flex flex-fill">
-            <div class="item-avatar mr-2 face" style="background-image:url('https://favicon.memobbs.app?url=${item.link}')"></div>
-            <div class="item-sub d-flex flex-column p-1">
-              <div class="item-creator"><a href="${item.link}" target="_blank" rel="noopener nofollow" >${item.title}</a></div>
-              <span class="myfeeds-floor">${i+1}</span>
-              <div class="item-mate mt-2 text-xs">${item.published}</div>
-            </div>
-          </div>
-        </div>
-        `;
-        myfeedsDom.innerHTML = myFeedArticle
-      }
-      document.querySelectorAll('.myfeeds-xml').forEach((item) => {item.classList.remove('noclick');})
-      window.Lately && Lately.init({target: '.item-mate'});
-    });
-  }
-  if(type=="jixin"){
-    fetch("https://cors.memobbs.app/https://firewood.news/rss.xml").then(response => response.text()).then(str => new window.DOMParser().parseFromString(str, 'text/xml'))
-    .then(data => {
-      entries = Array.from(data.querySelectorAll('item')).map(entry => {
-        return {
-          title: entry.querySelector('title').textContent,
-          link: entry.querySelector('link').textContent,
-          published: entry.querySelector('pubDate').textContent,
-          creator: entry.querySelector('author').textContent.charAt(0)
-        };
-      });
-      var myFeedArticle = '';
-      for (var i = 0;i<15;i++){
         let item = entries[i];
         myFeedArticle +=`
         <div class="card-item flex-fill p-3">
